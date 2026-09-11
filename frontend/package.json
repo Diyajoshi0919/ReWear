@@ -1,0 +1,41 @@
+{
+  "name": "frontend",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@aptos-labs/ts-sdk": "^1.20.0",
+    "@aptos-labs/wallet-adapter-ant-design": "^5.3.0",
+    "@aptos-labs/wallet-adapter-core": "^3.16.0",
+    "@aptos-labs/wallet-adapter-react": "^7.2.0",
+    "@martianwallet/aptos-wallet-adapter": "^0.0.5",
+    "@pontem/aptos-wallet-adapter": "^0.10.1",
+    "@tailwindcss/vite": "^4.1.11",
+    "antd": "^5.28.0",
+    "aptos": "^1.22.1",
+    "lucide-react": "^0.542.0",
+    "petra-plugin-wallet-adapter": "^0.4.5",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-router-dom": "^7.6.3",
+    "recharts": "^3.3.0",
+    "tailwindcss": "^4.1.11"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.30.1",
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
+    "@vitejs/plugin-react": "^4.6.0",
+    "eslint": "^9.30.1",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.20",
+    "globals": "^16.3.0",
+    "vite": "^7.0.4"
+  }
+}
