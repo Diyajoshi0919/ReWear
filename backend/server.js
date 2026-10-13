@@ -1,49 +1,56 @@
-import express from 'express';
-import dotenv from 'dotenv';
-import path from "path";
-import { fileURLToPath } from "url";
-import cors from 'cors';
+import "./config/env.js"; // must be the first import
+import express from "express";
+import cors from "cors";
+import rateLimit from "express-rate-limit";
 
-// 1. Path setup
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// 2. Load Environment Variables (SABSE UPAR)
-dotenv.config({ path: path.join(__dirname, "../.env") });
-console.log("✅ .env variables loaded");
-
-// 3. Imports
-import connectDB from './config/db.js';
-import authRoutes from './routes/authRoutes.js';
-import itemRoutes from './routes/itemRoutes.js';
-import swapRoutes from './routes/swapRoutes.js';
+import connectDB from "./config/db.js";
+import authRoutes from "./routes/authRoutes.js";
+import itemRoutes from "./routes/itemRoutes.js";
+import swapRoutes from "./routes/swapRoutes.js";
 import clipRoutes from "./routes/clipRoutes.js";
-import errorHandler from './middlewares/errorHandler.js';
+import { notFound, errorHandler } from "./middlewares/errorHandler.js";
 
-// 4. App Initialization
 const app = express();
 
-// 5. Middleware
-app.use(cors({
-    origin: ["https://rewear-alpha.vercel.app", "http://localhost:5173"], 
+// Render and similar hosts sit behind a proxy; needed for correct client IPs in rate limiting.
+app.set("trust proxy", 1);
+
+// CORS: allowed frontend origins come from CLIENT_URL (comma-separated).
+const allowedOrigins = (process.env.CLIENT_URL || "http://localhost:5173")
+  .split(",")
+  .map((origin) => origin.trim());
+
+app.use(
+  cors({
+    origin: allowedOrigins,
     methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true
-}));
-app.use(express.json());
+  })
+);
+app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ extended: true }));
 
-// 6. Database Connection (Environment variables load hone ke baad)
-connectDB();
+// Limit login/signup attempts to slow down password guessing.
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { message: "Too many attempts. Please try again in 15 minutes." },
+});
 
-// 7. Routes
+// Health check (Render uses this to see if the service is up).
+app.get("/", (req, res) => res.json({ status: "ok", service: "ReWear API" }));
+
+app.use("/api/auth", authLimiter, authRoutes);
+app.use("/api/items", itemRoutes);
+app.use("/api/swaps", swapRoutes);
 app.use("/api/clip", clipRoutes);
-app.use('/api/auth', authRoutes);
-app.use('/api/items', itemRoutes);
-app.use('/api/swaps', swapRoutes);
 
-// 8. Error Handler
+app.use(notFound);
 app.use(errorHandler);
 
-// 9. Server Start
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
+
+connectDB().then(() => {
+  app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
+});

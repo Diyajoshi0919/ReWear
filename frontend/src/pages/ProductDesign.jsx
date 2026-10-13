@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import API from "../api/axios";
+import API, { errorMessage } from "../api/axios";
 
 const ProductDesign = () => {
   const [form, setForm] = useState({
@@ -13,6 +13,7 @@ const ProductDesign = () => {
 
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [fileInputKey, setFileInputKey] = useState(0); // changing this clears the file input
 
   // 🔹 Handle text input
   const handleChange = (e) => {
@@ -28,9 +29,16 @@ const ProductDesign = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const token = localStorage.getItem("token");
-    if (!token) {
-      alert("❌ Please log in first to upload an item.");
+    if (images.length === 0) {
+      alert("Please choose at least one image.");
+      return;
+    }
+    if (images.length > 5) {
+      alert("You can upload up to 5 images.");
+      return;
+    }
+    if (images.some((img) => img.size > 5 * 1024 * 1024)) {
+      alert("Each image must be smaller than 5 MB.");
       return;
     }
 
@@ -41,14 +49,10 @@ const ProductDesign = () => {
     try {
       setLoading(true);
 
-      const res = await API.post("/items/upload", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      // axios sets the multipart Content-Type (with boundary) and the token automatically
+      await API.post("/items/upload", formData);
 
-      alert("✅ Item uploaded successfully!");
+      alert("✅ Item uploaded!");
 
       setForm({
         title: "",
@@ -59,8 +63,9 @@ const ProductDesign = () => {
         tags: "",
       });
       setImages([]);
+      setFileInputKey((k) => k + 1);
     } catch (err) {
-      alert(err.response?.data?.message || "❌ Upload failed. Try again!");
+      alert(errorMessage(err, "Upload failed. Please try again."));
     } finally {
       setLoading(false);
     }
@@ -132,11 +137,12 @@ const ProductDesign = () => {
         />
 
         <input
+          key={fileInputKey}
           type="file"
           multiple
           onChange={handleFileChange}
           className="block w-full text-sm"
-          accept="image/*"
+          accept="image/jpeg,image/png"
         />
 
         <button

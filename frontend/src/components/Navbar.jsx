@@ -1,13 +1,11 @@
 // components/Navbar.jsx
 import React, { useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
-import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { Menu, X } from "lucide-react";
 
 const Navbar = () => {
   const location = useLocation();
   const currentPath = location.pathname;
-  const { connect, disconnect, account } = useWallet();
 
   const [open, setOpen] = useState(false);
 

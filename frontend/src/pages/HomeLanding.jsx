@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import API from "../api/axios";
+import { isLoggedIn, clearToken } from "../utils/auth";
 import { Search } from "lucide-react";
 
 const HomeLanding = () => {
   const navigate = useNavigate();
-  const token = localStorage.getItem("token");
+  const [loggedIn, setLoggedIn] = useState(isLoggedIn());
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -13,11 +14,8 @@ const HomeLanding = () => {
   useEffect(() => {
     const fetchItems = async () => {
       try {
-        const res = await axios.get(
-          "https://rewearserverlatest.onrender.com/api/items"
-        );
-        const data = Array.isArray(res.data) ? res.data : res.data.items;
-        setItems(data);
+        const res = await API.get("/items");
+        setItems(Array.isArray(res.data) ? res.data : []);
       } catch (err) {
         console.error("Error fetching items:", err);
       } finally {
@@ -29,9 +27,9 @@ const HomeLanding = () => {
 
   // Logout
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    alert("Logged out successfully!");
-    navigate("/login");
+    clearToken();
+    setLoggedIn(false);
+    navigate("/");
   };
 
   return (
@@ -66,7 +64,7 @@ const HomeLanding = () => {
             <span className="hidden sm:block">Browse</span>
           </Link>
 
-          {!token ? (
+          {!loggedIn ? (
             <div className="flex items-center gap-4 sm:gap-6">
               <Link to="/login" className="hover:underline">
                 Login
@@ -142,7 +140,7 @@ const HomeLanding = () => {
                 <img
                   src={
                     item.images?.[0] ||
-                    "https://via.placeholder.com/200x250?text=No+Image"
+                    "/placeholder.svg"
                   }
                   alt={item.title}
                   className="w-32 h-44 sm:w-44 sm:h-60 object-cover rounded-xl"
@@ -171,8 +169,8 @@ const HomeLanding = () => {
       <section className="bg-white px-4 sm:px-8 py-12 text-center">
         <h3 className="text-lg sm:text-xl font-semibold mb-4">Why ReWear?</h3>
         <p className="text-gray-600 max-w-xl mx-auto mb-6 text-sm sm:text-base">
-          Over <strong>2,000+</strong> successful swaps, <strong>15kg</strong> of
-          fabric saved, and a growing community of eco-conscious fashion lovers.
+          Every swap keeps a piece of clothing in use and out of a landfill. List
+          what you no longer wear and trade it for something you will.
         </p>
       </section>
 

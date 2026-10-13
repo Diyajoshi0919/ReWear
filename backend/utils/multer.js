@@ -7,8 +7,13 @@ const storage = new CloudinaryStorage({
   params: {
     folder: "ReWear/items",
     allowed_formats: ["jpg", "jpeg", "png"],
+    transformation: [{ width: 1200, crop: "limit", quality: "auto" }],
   },
 });
 
-const upload = multer({ storage });
+const upload = multer({
+  storage,
+  limits: { fileSize: 5 * 1024 * 1024, files: 5 }, // 5 MB per image, max 5 images
+});
+
 export default upload;
