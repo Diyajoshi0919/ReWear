@@ -42,16 +42,16 @@ frontend/
 | --- | --- | --- | --- |
 | POST | `/api/auth/signup` | | Create an account |
 | POST | `/api/auth/login` | | Log in, returns a JWT |
-| GET | `/api/auth/me` | ✅ | Current user |
+| GET | `/api/auth/me` | | Current user |
 | GET | `/api/items?search=&category=` | | Available items, with search and filter |
 | GET | `/api/items/categories` | | Distinct categories |
-| GET | `/api/items/mine` | ✅ | Your own listings |
-| POST | `/api/items/upload` | ✅ | Create a listing (multipart, field `images`) |
-| DELETE | `/api/items/:id` | ✅ | Delete your own listing |
-| POST | `/api/swaps/request` | ✅ | Offer one of your items for someone else's |
-| POST | `/api/swaps/respond` | ✅ | Accept or reject a request for your item |
-| GET | `/api/swaps` | ✅ | Swaps you're part of |
-| POST | `/api/clip/suggest` | ✅ | AI category suggestion (needs CLIP service) |
+| GET | `/api/items/mine` | | Your own listings |
+| POST | `/api/items/upload` | | Create a listing (multipart, field `images`) |
+| DELETE | `/api/items/:id` | | Delete your own listing |
+| POST | `/api/swaps/request` | | Offer one of your items for someone else's |
+| POST | `/api/swaps/respond` | | Accept or reject a request for your item |
+| GET | `/api/swaps` | | Swaps you're part of |
+| POST | `/api/clip/suggest` | | AI category suggestion (needs CLIP service) |
 
 ## Running locally
 
